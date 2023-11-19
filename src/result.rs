@@ -11,7 +11,7 @@ pub enum Error {
     /// Deserialization error (i.e. unexpected result format received from server).
     Deserialization,
     /// FCM server error (returned directly to caller).
-    FCM(String),
+    FCM { status_code: u16, body: String },
     /// Timed out while waiting for server. According to Google, [the server should use exponential back-off to
     /// deal with timeout errors](https://firebase.google.com/docs/cloud-messaging/server).
     Timeout,
@@ -23,7 +23,7 @@ impl std::fmt::Display for Error {
             Error::Auth => write!(f, "authentication error"),
             Error::Config => write!(f, "configuration error"),
             Error::Deserialization => write!(f, "deserialization error"),
-            Error::FCM(msg) => write!(f, "firebase error: {}", msg),
+            Error::FCM { status_code, body } => write!(f, "firebase error: received {status_code} status code with body: {body}"),
             Error::Timeout => write!(f, "timeout"),
         }
     }

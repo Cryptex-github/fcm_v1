@@ -78,12 +78,10 @@ impl Client {
 
         if let Err(e) = resp.error_for_status_ref() {
             let http_status = e.status().unwrap();
-            return Err(Error::FCM(format!(
-                "error code {} ({}): {}",
-                http_status.as_u16(),
-                http_status.canonical_reason().unwrap(),
-                resp.text().await.map_err(|_| Error::Deserialization)?
-            )));
+            return Err(Error::FCM {
+                status_code: http_status.as_u16(),
+                body: resp.text().await.map_err(|_| Error::Deserialization)?,
+            });
         }
 
         return resp.json().await.map_err(|_| Error::Deserialization);
